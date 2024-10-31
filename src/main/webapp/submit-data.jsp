@@ -171,7 +171,7 @@
 				out.print("</tr>");
 				}
 	
-			totalBalance = totalIncome - totalExpense;
+			totalBalance = totalIncome + totalExpense;
 
 			}%>
 			

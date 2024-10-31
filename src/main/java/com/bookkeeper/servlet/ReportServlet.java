@@ -82,7 +82,7 @@ public class ReportServlet extends HttpServlet {
     private String buildQuery(String reportType) {
         switch (reportType) {
             case "day":
-                return "SELECT * FROM transactions WHERE DATE(date) = ?";
+                return "SELECT * FROM transactions WHERE DATE(date) = CURRENT_DATE";
             case "week":
                 return "SELECT * FROM transactions WHERE YEARWEEK(date, 1) = YEARWEEK(?, 1)";
             case "month":

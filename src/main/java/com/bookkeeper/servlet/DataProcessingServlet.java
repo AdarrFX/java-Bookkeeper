@@ -33,7 +33,7 @@ public class DataProcessingServlet extends HttpServlet {
         //processRequest(request, response);
         
         try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "SELECT * FROM income";
+            String sql = "SELECT * FROM income UNION SELECT * FROM expenses";
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             ResultSet orderResults = stmt.executeQuery();
@@ -80,6 +80,8 @@ public class DataProcessingServlet extends HttpServlet {
             String category = data.get("category");
             double income = Double.parseDouble(data.getOrDefault("income", "0"));
             double expense = Double.parseDouble(data.getOrDefault("expense", "0"));
+            
+            double totalCashFlow = income - expense;
 
             // Logging received data for debugging
             System.out.println("Received data:");
@@ -90,7 +92,7 @@ public class DataProcessingServlet extends HttpServlet {
             System.out.println("Expense: " + expense);
 
             String query;
-            if (income > 0) {
+            if (totalCashFlow > 0) {
                 query = "INSERT INTO income (user_id, source, amount, date, description) VALUES (?, ?, ?, ?, ?)";
             } else {
                 query = "INSERT INTO expenses (user_id, category, amount, date, description) VALUES (?, ?, ?, ?, ?)";
@@ -99,7 +101,7 @@ public class DataProcessingServlet extends HttpServlet {
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setInt(1, userId);
                 stmt.setString(2, category);
-                stmt.setDouble(3, income > 0 ? income : expense);
+                stmt.setDouble(3, income > 0 ? income : expense * -1);
                 stmt.setDate(4, java.sql.Date.valueOf(date));
                 stmt.setString(5, description);
                 stmt.executeUpdate();
