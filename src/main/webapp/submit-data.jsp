@@ -1,3 +1,5 @@
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.sql.ResultSetMetaData" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -127,6 +129,21 @@
                     <th>Expense</th>
                     <th>Balance</th>
                 </tr>
+    		<%
+			ResultSet orderResults = (ResultSet) request.getAttribute("orderResults");
+			ResultSetMetaData orderResultsMeta = (ResultSetMetaData)request.getAttribute("metaData");
+			if (orderResults != null){
+			while (orderResults.next()) {
+				out.print("<tr>");
+				for (int i = 1; i <= orderResultsMeta.getColumnCount(); i++) {
+					out.print("<td>");
+					out.print(orderResults.getString(i));
+					out.print("</td>");
+				}
+				out.print("</tr>");
+				}
+			}%>
+			
             </thead>
             <tbody></tbody>
             <tfoot>
@@ -166,6 +183,7 @@
 
         .then(response => {
             if (!response.ok) {
+            	console.log(response);
                 throw new Error('Network response was not ok ' + response.statusText);
             }
             return response.json();

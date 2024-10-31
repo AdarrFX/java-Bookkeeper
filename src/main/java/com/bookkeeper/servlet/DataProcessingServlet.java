@@ -26,6 +26,31 @@ import java.util.*;
 
 public class DataProcessingServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        //processRequest(request, response);
+        
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "SELECT * FROM income";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            ResultSet orderResults = stmt.executeQuery();
+            
+            System.out.println("Results of the orderresults");
+            System.out.println(orderResults);
+            
+            request.setAttribute("orderResults", orderResults);
+            request.setAttribute("metaData", orderResults.getMetaData());
+
+            request.getRequestDispatcher("/submit-data.jsp").forward(request, response);
+            
+        } catch (SQLException e) {
+            response.getWriter().write("Error" + e.getMessage());
+        }
+        
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

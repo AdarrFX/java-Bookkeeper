@@ -36,15 +36,15 @@ public class LoginServlet extends HttpServlet {
                         HttpSession session = request.getSession();
                         session.setAttribute("userId", userId);
                         
-                        response.sendRedirect("submit-data.html"); // Redirect to main page after login
+                        response.sendRedirect("processData"); // Redirect to main page after login
                     } else {
-                        response.sendRedirect("login.html?error=Invalid credentials");
+                        response.sendRedirect("index.html?error=Invalid credentials");
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("login.html?error=An error occurred");
+            response.sendRedirect("index.html?error=An error occurred");
         }
     }
 }
