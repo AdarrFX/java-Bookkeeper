@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Reports</title>
+    <link rel="stylesheet" href="css/styles.css">
+            <style>
+        .container {
+            width: 60%; 
+            margin: 20px auto; 
+            padding: 20px; 
+            background-color: #fff; 
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="submit-data.html" style="text-decoration: none; color: white;">
+            <span style="font-size: 1.5em;">Java BookKeeper</span>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="submit-data.html">Submit Data</a></li>
+                <li><a href="view-reports.html">View Reports</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="container">
+        <h2>View Financial Reports</h2>
+
+        <label for="reportType">Select Report Type:</label>
+        <select id="reportType" onchange="toggleDateInputs()">
+            <option value="day">Daily Report</option>
+            <option value="week">Weekly Report</option>
+            <option value="month">Monthly Report</option>
+        </select>
+
+        <div id="dayInput" style="display: none;">
+            <label for="day">Select Date:</label>
+            <input type="date" id="day">
+        </div>
+
+        <div id="weekInput" style="display: none;">
+            <label for="week">Select Week:</label>
+            <input type="week" id="week">
+        </div>
+
+        <div id="monthInput" style="display: none;">
+            <label for="month">Select Month:</label>
+            <input type="month" id="month">
+        </div>
+
+        <button id="generateReport">Generate Report</button>
+
+        <table id="reportTable" class="hidden">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Income</th>
+                    <th>Expense</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"><strong>Totals</strong></td>
+                    <td id="totalIncome">0.00</td>
+                    <td id="totalExpense">0.00</td>
+                    <td id="balance">0.00</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <script>
+        function toggleDateInputs() {
+            const reportType = document.getElementById('reportType').value;
+            document.getElementById('dayInput').style.display = reportType === 'day' ? 'block' : 'none';
+            document.getElementById('weekInput').style.display = reportType === 'week' ? 'block' : 'none';
+            document.getElementById('monthInput').style.display = reportType === 'month' ? 'block' : 'none';
+        }
+
+        document.getElementById('generateReport').addEventListener('click', function() {
+            const reportType = document.getElementById('reportType').value;
+            let dateParam = '';
+
+            if (reportType === 'day') {
+                dateParam = document.getElementById('day').value;
+            } else if (reportType === 'week') {
+                dateParam = document.getElementById('week').value;
+            } else if (reportType === 'month') {
+                dateParam = document.getElementById('month').value;
+            }
+
+            fetch(`/generateReport?reportType=${reportType}&date=${dateParam}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        console.error("Error:", data.error);
+                        alert("Error fetching report: " + data.error);
+                        return;
+                    }
+
+                    const reportTable = document.getElementById('reportTable');
+                    const tbody = reportTable.querySelector('tbody');
+                    tbody.innerHTML = '';
+
+                    data.reportData.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${new Date(item.date).toLocaleDateString()}</td>
+                            <td>${item.description}</td>
+                            <td>${item.category}</td>
+                            <td>${item.income.toFixed(2)}</td>
+                            <td>${item.expense.toFixed(2)}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    document.getElementById('totalIncome').textContent = data.totals.totalIncome.toFixed(2);
+                    document.getElementById('totalExpense').textContent = data.totals.totalExpense.toFixed(2);
+                    document.getElementById('balance').textContent = data.totals.balance.toFixed(2);
+
+                    reportTable.classList.remove('hidden');
+                })
+                .catch(error => console.error('Error fetching report:', error));
+        });
+    </script>
+</body>
+</html>
