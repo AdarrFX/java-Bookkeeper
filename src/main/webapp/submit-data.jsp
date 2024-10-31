@@ -132,16 +132,47 @@
     		<%
 			ResultSet orderResults = (ResultSet) request.getAttribute("orderResults");
 			ResultSetMetaData orderResultsMeta = (ResultSetMetaData)request.getAttribute("metaData");
+
+			float totalIncome = 0;
+			float totalExpense = 0;
+			float totalBalance = 0;
+
 			if (orderResults != null){
 			while (orderResults.next()) {
 				out.print("<tr>");
+				String[] fields = new String[7];
+
 				for (int i = 1; i <= orderResultsMeta.getColumnCount(); i++) {
-					out.print("<td>");
-					out.print(orderResults.getString(i));
-					out.print("</td>");
+
+					fields[i] = orderResults.getString(i);
+
 				}
+
+				out.print("<td>" + fields[5] + "</td>");
+				out.print("<td>" + fields[6] + "</td>");
+				out.print("<td>" + fields[3] + "</td>");
+
+				if (Float.parseFloat(fields[4]) >= 0){
+					out.print("<td>" + fields[4] + "</td>");
+					totalIncome += Float.parseFloat(fields[4]);
+				} else {
+					out.print("<td>" + 0 + "</td>");
+				}
+
+				if (Float.parseFloat(fields[4]) < 0) {
+					out.print("<td>" + fields[4] + "</td>");
+					totalExpense += Float.parseFloat(fields[4]);
+				} else {
+					out.print("<td>" + 0 + "</td>");
+				}
+
+				out.print("<td>" + fields[4] + "</td>");
+
 				out.print("</tr>");
 				}
+	
+			totalBalance = totalIncome - totalExpense;
+
 			}%>
 			
             </thead>
@@ -149,9 +180,9 @@
             <tfoot>
                 <tr>
                     <td colspan="3">Total</td>
-                    <td id="totalIncome">0.00</td>
-                    <td id="totalExpense">0.00</td>
-                    <td id="overallBalance">0.00</td>
+                    <td id="totalIncome"><% out.print(totalIncome); %></td>
+                    <td id="totalExpense"><% out.print(totalExpense); %></td>
+                    <td id="overallBalance"><% out.print(totalBalance); %></td>
                 </tr>
             </tfoot>
         </table>
