@@ -102,13 +102,31 @@
     <script>
         function toggleDateInputs() {
             const reportType = document.getElementById('reportType').value;
+            
+            // Set default value
+            if (reportType == null) {
+            	reportType = "day";
+            }
+            
             document.getElementById('dayInput').style.display = reportType === 'day' ? 'block' : 'none';
             document.getElementById('weekInput').style.display = reportType === 'week' ? 'block' : 'none';
             document.getElementById('monthInput').style.display = reportType === 'month' ? 'block' : 'none';
         }
-
+        
         document.getElementById('generateReport').addEventListener('click', function() {
-            const reportType = document.getElementById('reportType').value;
+        	
+        	const reportType = document.getElementById('reportType').value;
+        	
+        	const url = `/java-Bookkeeper/generateReport?reportType=${encodeURIComponent(reportType)}`
+        			+ `&day=${encodeURIComponent(document.getElementById('dayInput').value)}`
+        			+ `&day=${encodeURIComponent(document.getElementById('weekInput').value)}`
+        			+ `&day=${encodeURIComponent(document.getElementById('monthInput').value)}`;
+        			
+        			console.log(url);
+        			
+        	window.location.href = url;
+        	
+            /* const reportType = document.getElementById('reportType').value;
             let dateParam = '';
 
             if (reportType === 'day') {
@@ -155,7 +173,7 @@
 
                     reportTable.classList.remove('hidden');
                 })
-                .catch(error => console.error('Error fetching report:', error));
+                .catch(error => console.error('Error fetching report:', error)); */
         });
     </script>
 </body>

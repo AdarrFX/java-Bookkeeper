@@ -25,6 +25,11 @@ public class ReportServlet extends HttpServlet {
             throws ServletException, IOException {
         
         String reportType = request.getParameter("reportType");
+        
+        if (request.getParameter("reportType") == null) {
+        	response.sendRedirect("view-reports.html");
+        }
+        
         String date = request.getParameter("date");
         
         System.out.println("Report Type: " + reportType);
@@ -35,7 +40,8 @@ public class ReportServlet extends HttpServlet {
         double totalExpense = 0;
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-            String query = buildQuery(reportType);
+            String query = buildQuery(reportType, request);
+            System.out.println(query);
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, date);
                 if (reportType.equals("month")) {
@@ -79,14 +85,15 @@ public class ReportServlet extends HttpServlet {
         out.flush();
     }
 
-    private String buildQuery(String reportType) {
+    private String buildQuery(String reportType, HttpServletRequest request) {
+    	
         switch (reportType) {
             case "day":
-                return "SELECT * FROM transactions WHERE DATE(date) = CURRENT_DATE";
+                return "SELECT * FROM income UNION SELECT * FROM expenses WHERE DATE = " + request.getParameter("date");
             case "week":
-                return "SELECT * FROM transactions WHERE YEARWEEK(date, 1) = YEARWEEK(?, 1)";
+                return "SELECT * FROM income UNION SELECT * FROM expenses WHERE YEARWEEK(date, 1) = YEARWEEK(?, 1)";
             case "month":
-                return "SELECT * FROM transactions WHERE MONTH(date) = MONTH(?) AND YEAR(date) = YEAR(?)";
+                return "SELECT * FROM income UNION SELECT * FROM expenses WHERE MONTH(date) = MONTH(?) AND YEAR(date) = YEAR(?)";
             default:
                 throw new IllegalArgumentException("Invalid report type");
         }
