@@ -225,7 +225,7 @@
                 alert("Data saved successfully!");
 
 
-                overallBalance += data.income - data.expense;
+                /* overallBalance += data.income - data.expense;
                 totalIncome += data.income;
                 totalExpense += data.expense;
 
@@ -242,10 +242,11 @@
 
                 document.getElementById('totalIncome').textContent = totalIncome.toFixed(2);
                 document.getElementById('totalExpense').textContent = totalExpense.toFixed(2);
-                document.getElementById('overallBalance').textContent = overallBalance.toFixed(2);
+                document.getElementById('overallBalance').textContent = overallBalance.toFixed(2); */
 
 
                 document.getElementById('dataForm').reset();
+                window.location.href = "/processData";
             } else {
                 alert("Failed to save data: " + (result.error || 'Unknown error'));
             }
